@@ -1,0 +1,173 @@
+buildscript {
+    ext {
+        springBootVersion = '1.4.0.BUILD-SNAPSHOT'
+    }
+    repositories {
+        mavenCentral()
+        maven { url "https://repo.spring.io/snapshot" }
+        maven { url "https://repo.spring.io/milestone" }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'spring-boot'
+apply plugin: 'cpp'
+apply plugin: 'application'
+
+mainClassName = "me.leorblx.webtools.Application"
+
+test {
+    jvmArgs += [ "-Xmx1024M" ]
+}
+
+// Natives
+
+println "Building on OS: " + System.properties['os.name']
+println "Using JDK: " + System.properties['java.home']
+
+def jdk = System.properties['java.home']
+def SYS_INCLUDE_DIR = this.properties['system.include.dir']
+def SYS_LOCAL_INCLUDE_DIR = this.properties['system.local.include.dir']
+def JNI_INCLUDE_DIR = jdk + '/../include'
+def JNI_LIB_DIR = this.properties['jni.lib.dir'] + '/../include'
+
+println "Using JNI include directory: " + JNI_INCLUDE_DIR
+
+model {
+    components {
+        webtools(NativeLibrarySpec) {
+            sources {
+                cpp {
+                    source {
+                        srcDir 'src/main/jni'
+                        include "**/*.cpp"
+                    }
+                }
+            }
+            buildTypes {
+                debug
+                release
+            }
+        }
+    }
+    toolChains {
+        gcc(Gcc) {
+            eachPlatform {
+                if (System.properties['os.name'].equals('Mac OS X')) {
+                    cppCompiler.withArguments { args ->
+                        args << "-O2"
+                        args << "-I" + SYS_INCLUDE_DIR
+                        args << "-I" + SYS_LOCAL_INCLUDE_DIR
+                        args << "-I" + JNI_INCLUDE_DIR
+                        args << "-I" + JNI_INCLUDE_DIR + "/darwin"
+                        args << "-std=c++11"
+                    }
+                    linker.withArguments { args ->
+                        args << "-O2"
+                        args << "-lc++"
+                    }
+                } else {
+                    path "/opt/rh/devtoolset-2/root/usr/bin/gcc"
+                    cppCompiler.withArguments { args ->
+                        args << "-O2"
+                        args << "-I" + SYS_INCLUDE_DIR
+                        args << "-I" + SYS_LOCAL_INCLUDE_DIR
+                        args << "-I" + JNI_INCLUDE_DIR
+                        args << "-I" + JNI_INCLUDE_DIR + "/linux"
+                        args << "-std=c++11"
+                    }
+                    linker.withArguments { args ->
+                        args << "-O2"
+                        args << "-lstdc++"
+                    }
+                }
+            }
+        }
+        clang(Clang) {
+            eachPlatform {
+                if (System.properties['os.name'].equals('Mac OS X')) {
+                    cppCompiler.withArguments { args ->
+                        args << "-O2"
+                        args << "-I" + SYS_INCLUDE_DIR
+                        args << "-I" + SYS_LOCAL_INCLUDE_DIR
+                        args << "-I" + JNI_INCLUDE_DIR
+                        args << "-I" + JNI_INCLUDE_DIR + "/darwin"
+                        args << "-std=c++11"
+                    }
+                    linker.withArguments { args ->
+                        args << "-O2"
+                        args << "-lc++"
+                    }
+                } else {
+                    cppCompiler.withArguments { args ->
+                        args << "-O2"
+                        args << "-I" + SYS_INCLUDE_DIR
+                        args << "-I" + SYS_LOCAL_INCLUDE_DIR
+                        args << "-I" + JNI_INCLUDE_DIR
+                        args << "-I" + JNI_INCLUDE_DIR + "/linux"
+                        args << "-std=c++11"
+                    }
+                    linker.withArguments { args ->
+                        args << "-O2"
+                        args << "-lstdc++"
+                    }
+                }
+            }
+        }
+    }
+}
+
+task copyLibWebTools(type: Copy) {
+    ['libs', '.'].each { dest ->
+        copy {
+            if (System.properties['os.name'].equals('Mac OS X')) {
+                from "$projectDir/build/binaries/webtoolsSharedLibrary/libwebtools.dylib"
+            }
+            else {
+                from "$projectDir/build/binaries/webtoolsSharedLibrary/libwebtools.so"
+            }
+
+            into dest
+        }
+    }
+}
+
+jar {
+    baseName = 'nfsw-web-tools'
+    version = '0.0.1-SNAPSHOT'
+    manifest {
+        attributes 'Main-Class' : 'me.leorblx.webtools.Application'
+    }
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven { url "https://repo.spring.io/snapshot" }
+    maven { url "https://repo.spring.io/milestone" }
+}
+
+ext['thymeleaf.version'] = '3.0.0.RELEASE'
+ext['thymeleaf-layout-dialect.version'] = '2.0.0'
+
+dependencies {
+    compile('org.springframework.boot:spring-boot-starter-thymeleaf')
+    compile('org.springframework.boot:spring-boot-starter-security')
+    compile('org.springframework.boot:spring-boot-starter-actuator')
+    compile('org.thymeleaf.extras:thymeleaf-extras-java8time:3.0.0.RELEASE')
+
+    compile('org.webjars:bootstrap:3.3.7')
+    compile('org.webjars:jquery:2.2.1')
+    compile('org.webjars:bootswatch-cosmo:3.3.7')
+
+    compile('com.google.code.gson:gson:2.8.0')
+
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('org.seleniumhq.selenium:selenium-java:2.53.1')
+}

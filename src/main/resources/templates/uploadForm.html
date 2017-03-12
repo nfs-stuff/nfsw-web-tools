@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+
+<head>
+    <title>NFS:W Web Tools | File Decrypter</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="http://cdn.jsdelivr.net/webjars/bootswatch-cosmo/3.3.7/css/bootstrap.min.css"
+          th:href="@{/webjars/bootswatch-cosmo/3.3.7/css/bootstrap.min.css}"
+          rel="stylesheet" media="screen" />
+    <link href="../static/css/core.css"
+          th:href="@{/css/core.css}"
+          rel="stylesheet" media="screen" />
+    <script src="http://cdn.jsdelivr.net/webjars/jquery/2.2.1/jquery.min.js"
+            th:src="@{/webjars/jquery/2.2.1/jquery.min.js}"></script>
+</head>
+<body>
+<!-- Header -->
+<div>
+    <!-- ============================================================================ -->
+    <!-- This content is only used for static prototyping purposes (natural templates)-->
+    <!-- and is therefore entirely optional.                                           -->
+    <!-- ============================================================================ -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Static header</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#">Home</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Insert content into the layouts/layout.html -->
+<th:block layout:fragment="content">
+    <div class="row" style="padding-top: 25px;">
+        <div class="col-md-6 col-md-offset-3">
+            <div th:if="${message}">
+                <div th:class="${alertClass}">
+                    <span th:text="${message}"></span>
+
+                    <div th:if="${url}">
+                        <a th:href="${url}" class="alert-link" target="_blank">Download File</a>
+                    </div>
+                </div>
+            </div>
+
+            <h2>File Decrypter</h2>
+            <h6>Upload a <code>NFSWO_COMMUNICATION_LOG.txt</code> or <code>SystemSettings.dat</code> and get the contents.</h6>
+            <hr>
+            <form method="POST" enctype="multipart/form-data" action="/decrypt-upload">
+                <div class="form-group">
+                    <label for="file">File</label>
+                    <input type="file" id="file" name="file" th:name="file">
+                    <p class="help-block">Only files called <code>NFSWO_COMMUNICATION_LOG.txt</code> or <code>SystemSettings.dat</code> will be accepted.</p>
+                </div>
+                <button type="submit" class="btn btn-default">Submit</button>
+                <!--<table>-->
+                    <!--<tr>-->
+                        <!--<td>File to upload:</td>-->
+                        <!--<td><input type="file" name="file"/></td>-->
+                    <!--</tr>-->
+                    <!--<tr>-->
+                        <!--<td></td>-->
+                        <!--<td><input type="submit" value="Upload"/></td>-->
+                    <!--</tr>-->
+                <!--</table>-->
+            </form>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

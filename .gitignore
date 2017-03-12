@@ -1,0 +1,13 @@
+.idea/
+data/
+target/
+build/
+*.xml.old
+mvnw*
+*.dylib
+*.so
+.mvn/*
+.gradle/
+logs-tmp-upload/
+node_modules/
+dist/

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+
+<head>
+    <title>NFS:W Web Tools | BaseCarId Calculator</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="http://cdn.jsdelivr.net/webjars/bootswatch-cosmo/3.3.7/css/bootstrap.min.css"
+          th:href="@{/webjars/bootswatch-cosmo/3.3.7/css/bootstrap.min.css}"
+          rel="stylesheet" media="screen" />
+    <link href="../static/css/core.css"
+          th:href="@{/css/core.css}"
+          rel="stylesheet" media="screen" />
+    <script src="http://cdn.jsdelivr.net/webjars/jquery/2.2.1/jquery.min.js"
+            th:src="@{/webjars/jquery/2.2.1/jquery.min.js}"></script>
+</head>
+<body>
+<!-- Header -->
+<div>
+    <!-- ============================================================================ -->
+    <!-- This content is only used for static prototyping purposes (natural templates)-->
+    <!-- and is therefore entirely optional.                                           -->
+    <!-- ============================================================================ -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Static header</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#">Home</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Insert content into the layouts/layout.html -->
+<th:block layout:fragment="content">
+    <div class="row" style="padding-top: 25px;">
+        <div class="col-md-6 col-md-offset-3">
+            <physics-profile-calc inline-template>
+                <div>
+                    <div class="alert alert-info">
+                        This works for every known car.
+                    </div>
+
+                    <h2>PhysicsProfileHash Calculator</h2>
+                    <h6>Select a car and get the appropriate PhysicsProfileHash.</h6>
+                    <hr>
+                    <div v-if="carIdMap.length == 0">
+                        Loading cars...
+                    </div>
+                    <div v-else>
+                        <form onsubmit="return false;">
+                            <div class="form-group">
+                                <label for="carName">Car Name</label>
+                                <select v-model="carId" name="carName" id="carName" class="form-control">
+                                    <option v-for="carOption in carIdMap" v-bind:value="carOption.carId" v-bind:selected="carOption.carId == carId">
+                                        {{ carOption.carId }}
+                                    </option>
+                                </select>
+                            </div>
+                        </form>
+
+                        <h3>Hash: {{ hash }}</h3>
+                        <code>
+                            {{ generatedCode }}
+                        </code>
+                    </div>
+                </div>
+            </physics-profile-calc>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>
